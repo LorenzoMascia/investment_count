@@ -1,0 +1,407 @@
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simulatore ETF Professionale</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container-fluid p-4" id="app">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h2 mb-0">
+        <i class="fas fa-chart-line me-2"></i>
+        Simulatore ETF Professionale
+      </h1>
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-outline-primary btn-sm" onclick="ETFSimulator.exportReport()">
+          <i class="fas fa-file-export me-1"></i> Esporta Report
+        </button>
+        <button class="btn btn-outline-info btn-sm" onclick="ETFSimulator.showHelp()">
+          <i class="fas fa-question-circle me-1"></i> Aiuto
+        </button>
+        <label class="toggle-switch">
+          <input type="checkbox" id="darkToggle" onchange="ThemeManager.toggle()">
+          <span class="slider"></span>
+        </label>
+        <i class="fas fa-moon"></i>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Pannello di Controllo -->
+      <div class="col-lg-4 mb-4">
+        <div class="glass-card p-4">
+          <h5 class="mb-3">
+            <i class="fas fa-cog me-2"></i>
+            Configurazione Investimento
+          </h5>
+
+          <!-- Tabs per organizzare i controlli -->
+          <ul class="nav nav-tabs mb-3" id="controlTabs">
+            <li class="nav-item">
+              <a class="nav-link active" data-bs-toggle="tab" href="#basic-tab">Base</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#advanced-tab">Avanzato</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#scenarios-tab">Scenari</a>
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <!-- Controlli Base -->
+            <div class="tab-pane fade show active" id="basic-tab">
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="fas fa-euro-sign me-1"></i>
+                  Capitale Iniziale
+                  <span class="tooltip-custom" data-tooltip="Somma iniziale da investire">
+                    <i class="fas fa-info-circle text-muted"></i>
+                  </span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">€</span>
+                  <input type="number" id="initialCapital" class="form-control" value="10000" min="0" max="10000000" step="100">
+                </div>
+                <div class="form-text">Inserisci il capitale iniziale disponibile</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="monthlyContribution" class="form-label">Contributo Mensile</label>
+                  <i class="fas fa-calendar-plus me-1"></i>
+                  Contributo Mensile
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">€</span>
+                  <input type="number" id="monthlyContribution" class="form-control" value="500" min="0" max="50000" step="50">
+                </div>
+                <div class="form-text">Importo da investire ogni mese</div>
+              </div>
+
+              <div class="row">
+                <div class="col-6">
+                  <label class="form-label">
+                    <i class="fas fa-calendar me-1"></i>
+                    Durata (anni)
+                  </label>
+                  <input type="number" id="investmentYears" class="form-control" value="20" min="1" max="50">
+                  <div class="form-text">1-50 anni</div>
+                </div>
+                <div class="col-6">
+                  <label class="form-label">
+                    <i class="fas fa-chart-line me-1"></i>
+                    Rendimento (%)
+                  </label>
+                  <input type="number" id="expectedReturn" class="form-control" value="7" min="-20" max="30" step="0.1">
+                  <div class="form-text">Annuale atteso</div>
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-6">
+                  <label class="form-label">
+                    <i class="fas fa-fire me-1"></i>
+                    Inflazione (%)
+                  </label>
+                  <input type="number" id="inflationRate" class="form-control" value="2.5" min="0" max="15" step="0.1">
+                  <div class="form-text">Media annuale</div>
+                </div>
+                <div class="col-6">
+                  <label class="form-label">
+                    <i class="fas fa-percentage me-1"></i>
+                    Tasse (%)
+                  </label>
+                  <input type="number" id="taxRate" class="form-control" value="26" min="0" max="50" step="0.1">
+                  <div class="form-text">Su capital gains</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Controlli Avanzati -->
+            <div class="tab-pane fade" id="advanced-tab">
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="fas fa-trending-up me-1"></i>
+                  Crescita Contributo Annuale (%)
+                </label>
+                <input type="number" id="contributionGrowth" class="form-control" value="3" min="0" max="20" step="0.1">
+                <div class="form-text">Aumento annuale del contributo mensile</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="fas fa-coins me-1"></i>
+                  Costi Gestione Annuali (%)
+                </label>
+                <input type="number" id="managementFees" class="form-control" value="0.25" min="0" max="5" step="0.01">
+                <div class="form-text">TER dell'ETF (es. 0.25% per ETF azionario)</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="fas fa-chart-area me-1"></i>
+                  Volatilità (%)
+                </label>
+                <input type="range" id="volatility" class="form-range" value="15" min="5" max="40" step="1" oninput="document.getElementById('volatilityValue').textContent = this.value + '%'">
+                <div class="d-flex justify-content-between">
+                  <small>Bassa (5%)</small>
+                  <span id="volatilityValue" class="badge bg-primary">15%</span>
+                  <small>Alta (40%)</small>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="fas fa-calendar-alt me-1"></i>
+                  Data Inizio
+                </label>
+                <input type="date" id="startDate" class="form-control">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="fas fa-building me-1"></i>
+                  Tipo ETF
+                </label>
+                <select id="etfType" class="form-select" onchange="ETFSimulator.updateETFDefaults()">
+                  <option value="world">Azionario Mondo (MSCI World)</option>
+                  <option value="sp500">S&P 500</option>
+                  <option value="europe">Azionario Europa</option>
+                  <option value="emerging">Mercati Emergenti</option>
+                  <option value="bonds">Obbligazionario</option>
+                  <option value="mixed">Bilanciato 60/40</option>
+                </select>
+              </div>
+
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="includeReinvestment" checked>
+                <label class="form-check-label">
+                  <i class="fas fa-recycle me-1"></i>
+                  Reinvestimento Dividendi
+                </label>
+              </div>
+
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="includeInflationAdjustment" checked>
+                <label class="form-check-label">
+                  <i class="fas fa-balance-scale me-1"></i>
+                  Aggiustamento Inflazione
+                </label>
+              </div>
+
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="enableMonteCarloMode">
+                <label class="form-check-label">
+                  <i class="fas fa-dice me-1"></i>
+                  Simulazione Monte Carlo
+                  <span class="tooltip-custom" data-tooltip="Esegue multiple simulazioni con variazioni casuali">
+                    <i class="fas fa-info-circle text-muted"></i>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Scenari -->
+            <div class="tab-pane fade" id="scenarios-tab">
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6>Scenari di Rendimento</h6>
+                  <button class="btn btn-outline-success btn-sm" onclick="ScenarioManager.loadPresets()">
+                    <i class="fas fa-download me-1"></i>Preset
+                  </button>
+                </div>
+                <div id="scenariosList">
+                  <!-- Scenari generati dinamicamente -->
+                </div>
+                <button class="btn btn-outline-primary btn-sm w-100" onclick="ScenarioManager.add()">
+                  <i class="fas fa-plus me-1"></i> Aggiungi Scenario
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 mt-4">
+            <button class="btn btn-primary btn-lg" onclick="ETFSimulator.run()">
+              <i class="fas fa-play me-1"></i>
+              Esegui Simulazione
+            </button>
+            <div class="btn-group">
+              <button class="btn btn-outline-secondary" onclick="ETFSimulator.reset()">
+                <i class="fas fa-undo me-1"></i>
+                Reset
+              </button>
+              <button class="btn btn-outline-info" onclick="ETFSimulator.saveConfiguration()">
+                <i class="fas fa-save me-1"></i>
+                Salva Config
+              </button>
+              <button class="btn btn-outline-warning" onclick="ETFSimulator.loadConfiguration()">
+                <i class="fas fa-folder-open me-1"></i>
+                Carica Config
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="glass-card p-4 mt-4">
+          <h6 class="mb-3">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            Statistiche Rapide
+          </h6>
+          <div class="row g-2" id="quickStats">
+            <!-- Statistiche generate dinamicamente -->
+          </div>
+        </div>
+
+        <!-- Risk Assessment -->
+        <div class="glass-card p-4 mt-4">
+          <h6 class="mb-3">
+            <i class="fas fa-shield-alt me-2"></i>
+            Valutazione Rischio
+          </h6>
+          <div id="riskAssessment">
+            <!-- Valutazione del rischio -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Area Principale -->
+      <div class="col-lg-8">
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" id="loadingSpinner">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Caricamento...</span>
+          </div>
+          <p class="mt-2">Elaborazione simulazione...</p>
+          <div class="progress mt-3" style="height: 8px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Alert per messaggi -->
+        <div id="alertContainer"></div>
+
+        <!-- Grafici -->
+        <div id="chartsContainer">
+          <!-- Grafico Principale -->
+          <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">
+                <i class="fas fa-chart-line me-2"></i>
+                Crescita del Capitale
+              </h5>
+              <div class="d-flex gap-2">
+                <div class="btn-group btn-group-sm" role="group">
+                  <button type="button" class="btn btn-outline-primary active" onclick="ChartManager.setType('line')">Linea</button>
+                  <button type="button" class="btn btn-outline-primary" onclick="ChartManager.setType('area')">Area</button>
+                  <button type="button" class="btn btn-outline-primary" onclick="ChartManager.setType('bar')">Barre</button>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="ChartManager.resetZoom('main')">
+                  <i class="fas fa-search-minus"></i>
+                </button>
+              </div>
+            </div>
+            <canvas id="mainChart" height="100"></canvas>
+          </div>
+
+          <!-- Grafici Secondari -->
+          <div class="row">
+            <div class="col-lg-6 mb-4">
+              <div class="chart-container">
+                <h6><i class="fas fa-pie-chart me-2"></i>Composizione Finale</h6>
+                <canvas id="compositionChart" height="150"></canvas>
+              </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+              <div class="chart-container">
+                <h6><i class="fas fa-chart-bar me-2"></i>Rendimenti Annuali</h6>
+                <canvas id="returnsChart" height="150"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grafico Monte Carlo -->
+          <div class="chart-container" id="monteCarloContainer" style="display: none;">
+            <h6><i class="fas fa-dice me-2"></i>Distribuzione Risultati Monte Carlo</h6>
+            <canvas id="monteCarloChart" height="120"></canvas>
+          </div>
+
+          <!-- Tabella di Confronto -->
+          <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="mb-0"><i class="fas fa-table me-2"></i>Analisi Dettagliata</h6>
+              <button class="btn btn-outline-primary btn-sm" onclick="TableManager.exportToCSV()">
+                <i class="fas fa-download me-1"></i>Esporta CSV
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table comparison-table">
+                <thead>
+                  <tr>
+                    <th>Metrica</th>
+                    <th>Valore</th>
+                    <th>Dettagli</th>
+                    <th>Valutazione</th>
+                  </tr>
+                </thead>
+                <tbody id="detailsTable">
+                  <!-- Righe generate dinamicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Proiezioni Future -->
+          <div class="chart-container">
+            <h6><i class="fas fa-crystal-ball me-2"></i>Proiezioni e Milestone</h6>
+            <div id="milestonesContainer">
+              <!-- Milestone generate dinamicamente -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal di Aiuto -->
+  <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="helpModalLabel">
+          <i class="fas fa-question-circle me-2"></i>
+          Guida al Simulatore ETF
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+      </div>
+        <div class="modal-body" id="helpContent">
+          <!-- Contenuto della guida -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <!-- Librerie esterne -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1/dist/chartjs-plugin-zoom.min.js"></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-adapter-date-fns/3.0.0/chartjs-adapter-date-fns.bundle.min.js"></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script> 
+ 
+  <!-- Script personalizzati -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/theme-manager.js"></script>
+  <script src="js/scenario-manager.js"></script>
+  <script src="js/chart-manager.js"></script>
+  <script src="js/table-manager.js"></script>
+  <script src="js/calculator.js"></script>
+  <script src="js/export-manager.js"></script>
+  <script src="js/etf-simulator.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
