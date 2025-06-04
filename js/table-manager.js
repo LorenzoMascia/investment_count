@@ -1,150 +1,110 @@
-/**
- * Classe per gestire le tabelle dei risultati nella UI
- */
-class TableManager {
-  /**
-   * Aggiorna la tabella dettaglio con i risultati della simulazione
-   * @param {Object} simulation - Oggetto simulazione restituito da Calculator.calculateETFGrowth()
-   */
-  static updateDetailsTable(simulation) {
-    if (!simulation) return;
-
-    const config = ETFSimulator.getCurrentConfig();
-
-    // Dati righe tabella
-    const rows = [
-      {
-        metric: 'Capitale Finale',
-        value: Utils.formatCurrency(simulation.finalCapital),
-        details: 'Valore totale alla fine del periodo',
-        evaluation: this.getEvaluation(simulation.finalCapital, simulation.totalInvested)
-      },
-      {
-        metric: 'Totale Investito',
-        value: Utils.formatCurrency(simulation.totalInvested),
-        details: 'Somma di tutti i contributi versati',
-        evaluation: 'Investimento totale'
-      },
-      {
-        metric: 'Guadagno Netto',
-        value: Utils.formatCurrency(simulation.netProfit),
-        details: `Dopo tasse (${config.taxRate}%)`,
-        evaluation: this.getProfitEvaluation(simulation.netProfit, simulation.totalInvested)
-      },
-      {
-        metric: 'Rendimento Annualizzato',
-        value: `${simulation.annualizedReturn.toFixed(2)}%`,
-        details: 'Rendimento composto annuo',
-        evaluation: this.getReturnEvaluation(simulation.annualizedReturn)
-      },
-      {
-        metric: 'Inflazione Corretta',
-        value: Utils.formatCurrency(simulation.inflationAdjustedFinalCapital),
-        details: `Valore reale (inflazione ${config.inflationRate}%)`,
-        evaluation: 'Potere d\'acquisto finale'
-      },
-      {
-        metric: 'Costi Totali Gestione',
-        value: Utils.formatCurrency(simulation.totalFees),
-        details: `Commissioni (${config.managementFees}% annuo)`,
-        evaluation: 'Costi accumulati'
-      },
-      {
-        metric: 'Peggiore Anno',
-        value: simulation.worstYear ? 
-          `${simulation.worstYear.year}: ${simulation.worstYear.return.toFixed(2)}%` : 'N/A',
-        details: 'Peggiore rendimento annuale',
-        evaluation: 'Performance negativa'
-      },
-      {
-        metric: 'Miglior Anno',
-        value: simulation.bestYear ? 
-          `${simulation.bestYear.year}: ${simulation.bestYear.return.toFixed(2)}%` : 'N/A',
-        details: 'Miglior rendimento annuale',
-        evaluation: 'Performance positiva'
-      }
-    ];
-
-    // Genera HTML dinamico
-    let html = '';
-    rows.forEach(row => {
-      html += `
-        <tr>
-          <td><strong>${row.metric}</strong></td>
-          <td>${row.value}</td>
-          <td class="text-muted small">${row.details}</td>
-          <td>${row.evaluation}</td>
-        </tr>
-      `;
-    });
-
-    // Inserisci HTML nella tabella
-    const tableElement = document.getElementById('detailsTable');
-    if (tableElement) {
-      tableElement.innerHTML = html;
-    } else {
-      console.warn("Tabella 'detailsTable' non trovata nel DOM");
+const TableManager = {
+    // Aggiorna la tabella con i risultati
+    updateTable: function(results) {
+        const tableBody = document.getElementById('detailsTable');
+        if (!results || !results.baseProjection) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center">Nessun dato disponibile</td>
+                </tr>
+            `;
+            return;
+        }
+        const finalYear = results.baseProjection[results.baseProjection.length - 1];
+        const metrics = [
+            {
+                metric: "Valore Finale",
+                value: `€${finalYear.value.toLocaleString('it-IT', { maximumFractionDigits: 2 })}`,
+                details: "Totale investimento finale dopo tasse e commissioni",
+                rating: this.getRating(finalYear.value / finalYear.totalInvested)
+            },
+            {
+                metric: "Capitale Investito Totale",
+                value: `€${finalYear.totalInvested.toLocaleString('it-IT', { maximumFractionDigits: 2 })}`,
+                details: "Somma iniziale più contributi mensili accumulati",
+                rating: this.getRating(finalYear.totalInvested / finalYear.value)
+            },
+            {
+                metric: "Guadagno Netto",
+                value: `€${(finalYear.value - finalYear.totalInvested).toLocaleString('it-IT', { maximumFractionDigits: 2 })}`,
+                details: "Guadagno lordo meno tasse pagate",
+                rating: this.getRating((finalYear.value - finalYear.totalInvested) / finalYear.totalInvested)
+            },
+            {
+                metric: "Tasso Crescita Annuale Composto (CAGR)",
+                value: `${(results.cagr * 100).toFixed(2)}%`,
+                details: "Percentuale media annua di crescita composta",
+                rating: this.getRating(results.cagr * 100)
+            },
+            {
+                metric: "Volatilità Effettiva",
+                value: `${(results.actualVolatility * 100).toFixed(2)}%`,
+                details: "Deviazione standard dei rendimenti annuali",
+                rating: this.getRating(results.actualVolatility * 100)
+            },
+            {
+                metric: "Massimo Drawdown",
+                value: `${(results.maxDrawdown * 100).toFixed(2)}%`,
+                details: "Massima perdita rispetto al picco storico",
+                rating: this.getRating(results.maxDrawdown * 100)
+            }
+        ];
+        tableBody.innerHTML = '';
+        metrics.forEach(metric => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${metric.metric}</td>
+                <td>${metric.value}</td>
+                <td>${metric.details}</td>
+                <td><span class="badge bg-${metric.rating.class}">${metric.rating.text}</span></td>
+            `;
+            tableBody.appendChild(row);
+        });
+    },
+    // Resetta la tabella
+    resetTable: function() {
+        document.getElementById('detailsTable').innerHTML = '';
+    },
+    // Esporta i dati della tabella in formato CSV
+    exportToCSV: function() {
+        const table = document.querySelector('.comparison-table');
+        let csv = [];
+        const rows = table.querySelectorAll('tr');
+        for (let row of rows) {
+            let cols = row.querySelectorAll('td, th');
+            let rowData = [];
+            for (let col of cols) {
+                rowData.push(`"${col.innerText.trim()}"`);
+            }
+            csv.push(rowData.join(','));
+        }
+        const csvString = csv.join('\n');
+        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'report_simulazione.csv');
+        link.click();
+    },
+    // Valuta un valore e restituisce una valutazione
+    getRating: function(value) {
+        let ratingClass, ratingText;
+        if (typeof value === 'string') {
+            value = parseFloat(value.replace(/[^0-9.-]/g, ''));
+        }
+        if (value > 0 && value <= 10) {
+            ratingClass = 'success';
+            ratingText = 'Eccellente';
+        } else if (value <= 25) {
+            ratingClass = 'primary';
+            ratingText = 'Buono';
+        } else if (value <= 50) {
+            ratingClass = 'warning';
+            ratingText = 'Medio';
+        } else {
+            ratingClass = 'danger';
+            ratingText = 'Basso';
+        }
+        return { class: ratingClass, text: ratingText };
     }
-  }
-
-  /**
-   * Valuta il rapporto tra capitale finale e investito
-   * @param {number} finalValue - Capitale finale
-   * @param {number} invested - Totale investito
-   * @returns {string} Badge HTML con valutazione
-   */
-  static getEvaluation(finalValue, invested) {
-    const ratio = finalValue / invested;
-    if (ratio > 3) return '<span class="badge bg-success">Eccellente</span>';
-    if (ratio > 2) return '<span class="badge bg-primary">Ottimo</span>';
-    if (ratio > 1.5) return '<span class="badge bg-info">Buono</span>';
-    if (ratio > 1) return '<span class="badge bg-secondary">Accettabile</span>';
-    return '<span class="badge bg-warning">Scarso</span>';
-  }
-
-  /**
-   * Valuta il guadagno netto in percentuale rispetto al totale investito
-   * @param {number} profit - Guadagno netto
-   * @param {number} invested - Totale investito
-   * @returns {string} Badge HTML con valutazione
-   */
-  static getProfitEvaluation(profit, invested) {
-    const percentage = (profit / invested) * 100;
-    if (percentage > 200) return '<span class="badge bg-success">Ritorno eccezionale</span>';
-    if (percentage > 100) return '<span class="badge bg-primary">Alto guadagno</span>';
-    if (percentage > 50) return '<span class="badge bg-info">Buon guadagno</span>';
-    if (percentage > 0) return '<span class="badge bg-secondary">Guadagno modesto</span>';
-    return '<span class="badge bg-danger">Perdita</span>';
-  }
-
-  /**
-   * Valuta il rendimento annualizzato
-   * @param {number} annualReturn - Rendimento annuale in percentuale
-   * @returns {string} Badge HTML con valutazione
-   */
-  static getReturnEvaluation(annualReturn) {
-    if (annualReturn > 15) return '<span class="badge bg-success">Molto alto</span>';
-    if (annualReturn > 10) return '<span class="badge bg-primary">Alto</span>';
-    if (annualReturn > 7) return '<span class="badge bg-info">Medio-alto</span>';
-    if (annualReturn > 5) return '<span class="badge bg-secondary">Medio</span>';
-    if (annualReturn > 0) return '<span class="badge bg-warning">Basso</span>';
-    return '<span class="badge bg-danger">Negativo</span>';
-  }
-
-  /**
-   * Esporta i dati in formato CSV
-   * Placeholder per ExportManager
-   */
-  static exportToCSV() {
-    try {
-      if (typeof ExportManager !== 'undefined' && ExportManager.exportToCSV) {
-        ExportManager.exportToCSV();
-      } else {
-        throw new Error("ExportManager non disponibile o metodo exportToCSV non implementato");
-      }
-    } catch (error) {
-      console.error("Errore nell'esportazione CSV:", error);
-      Utils.showToast("Errore nell'esportazione CSV", "danger");
-    }
-  }
-}
+};

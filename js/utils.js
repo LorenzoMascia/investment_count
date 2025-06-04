@@ -58,7 +58,7 @@ const Utils = {
     const start = element.scrollTop;
     const change = to - start;
     const startTime = performance.now();
-    const animateScroll = (currentTime) => {
+    const animateScroll = (currentTime) => {310
       const timeElapsed = currentTime - startTime;
       const progress = Math.min(timeElapsed / duration, 1);
       element.scrollTop = start + change * this.easeInOutQuad(progress);
