@@ -1,10 +1,10 @@
-// Configurazione globale dell'applicazione
+// Global application configuration
 const CONFIG = {
-  // Impostazioni generali
-  APP_NAME: 'Simulatore ETF Professionale',
+  // General settings
+  APP_NAME: 'Professional Investment Simulator',
   VERSION: '1.0.0',
   
-  // Limiti di input
+  // Input limits
   LIMITS: {
     MIN_CAPITAL: 0,
     MAX_CAPITAL: 10000000,
@@ -24,93 +24,93 @@ const CONFIG = {
     MAX_FEES: 5
   },
   
-  // Preset ETF con parametri realistici
+  // ETF presets with realistic parameters
   ETF_PRESETS: {
     world: {
-      name: 'Azionario Mondo (MSCI World)',
+      name: 'World Equity (MSCI World)',
       expectedReturn: 7.0,
       volatility: 15,
       fees: 0.25,
-      description: 'ETF diversificato sui mercati sviluppati globali'
+      description: 'Diversified ETF on global developed markets'
     },
     sp500: {
       name: 'S&P 500',
       expectedReturn: 8.5,
       volatility: 18,
       fees: 0.15,
-      description: 'ETF sulle 500 maggiori aziende USA'
+      description: 'ETF on the 500 largest US companies'
     },
     europe: {
-      name: 'Azionario Europa',
+      name: 'European Equity',
       expectedReturn: 6.5,
       volatility: 16,
       fees: 0.30,
-      description: 'ETF sui mercati azionari europei'
+      description: 'ETF on European equity markets'
     },
     emerging: {
-      name: 'Mercati Emergenti',
+      name: 'Emerging Markets',
       expectedReturn: 8.0,
       volatility: 22,
       fees: 0.45,
-      description: 'ETF sui mercati emergenti'
+      description: 'ETF on emerging markets'
     },
     bonds: {
-      name: 'Obbligazionario',
+      name: 'Bond Market',
       expectedReturn: 3.5,
       volatility: 8,
       fees: 0.20,
-      description: 'ETF obbligazionario diversificato'
+      description: 'Diversified bond ETF'
     },
     mixed: {
-      name: 'Bilanciato 60/40',
+      name: 'Balanced 60/40',
       expectedReturn: 5.5,
       volatility: 12,
       fees: 0.35,
-      description: '60% azioni, 40% obbligazioni'
+      description: '60% equities, 40% bonds'
     }
   },
   
-  // Scenari predefiniti
+  // Predefined scenarios
   SCENARIO_PRESETS: [
     {
-      name: 'Conservativo',
+      name: 'Conservative',
       expectedReturn: 4.0,
       volatility: 8,
-      description: 'Profilo di rischio basso'
+      description: 'Low risk profile'
     },
     {
-      name: 'Moderato',
+      name: 'Moderate',
       expectedReturn: 6.0,
       volatility: 12,
-      description: 'Profilo di rischio medio'
+      description: 'Medium risk profile'
     },
     {
-      name: 'Aggressivo',
+      name: 'Aggressive',
       expectedReturn: 8.5,
       volatility: 18,
-      description: 'Profilo di rischio alto'
+      description: 'High risk profile'
     },
     {
-      name: 'Crisi 2008',
+      name: '2008 Crisis',
       expectedReturn: -35,
       volatility: 30,
-      description: 'Anno di crisi finanziaria'
+      description: 'Financial crisis year'
     },
     {
       name: 'Bull Market',
       expectedReturn: 25,
       volatility: 15,
-      description: 'Anno eccezionale'
+      description: 'Exceptional year'
     }
   ],
   
-  // Impostazioni Monte Carlo
+  // Monte Carlo settings
   MONTE_CARLO: {
     SIMULATIONS: 1000,
     CONFIDENCE_INTERVALS: [10, 25, 50, 75, 90]
   },
   
-  // Colori per i grafici
+  // Chart colors
   CHART_COLORS: {
     primary: '#007bff',
     secondary: '#6c757d',
@@ -128,7 +128,7 @@ const CONFIG = {
     }
   },
   
-  // Formati di output
+  // Output formats
   FORMATS: {
     CURRENCY: {
       style: 'currency',
@@ -147,27 +147,27 @@ const CONFIG = {
     }
   },
   
-  // Messaggi di validazione
+  // Validation messages
   VALIDATION_MESSAGES: {
-    REQUIRED: 'Questo campo è obbligatorio',
-    MIN_VALUE: 'Il valore deve essere almeno {min}',
-    MAX_VALUE: 'Il valore non può superare {max}',
-    INVALID_NUMBER: 'Inserire un numero valido',
-    INVALID_DATE: 'Inserire una data valida'
+    REQUIRED: 'This field is required',
+    MIN_VALUE: 'The value must be at least {min}',
+    MAX_VALUE: 'The value cannot exceed {max}',
+    INVALID_NUMBER: 'Enter a valid number',
+    INVALID_DATE: 'Enter a valid date'
   },
   
-  // Testi di aiuto
+  // Help texts
   HELP_TEXTS: {
-    INITIAL_CAPITAL: 'Il capitale iniziale è la somma che hai già disponibile per iniziare ad investire.',
-    MONTHLY_CONTRIBUTION: 'L\'importo che intendi investire ogni mese in aggiunta al capitale iniziale.',
-    EXPECTED_RETURN: 'Il rendimento annuale medio atteso dell\'ETF, basato su dati storici.',
-    VOLATILITY: 'Misura la variabilità dei rendimenti. Più alta è, più i risultati possono variare.',
-    INFLATION: 'Il tasso di inflazione riduce il potere d\'acquisto nel tempo.',
-    TAXES: 'Le tasse sui capital gains che dovrai pagare sui guadagni.',
-    MONTE_CARLO: 'Simula migliaia di scenari diversi per valutare la probabilità di successo.'
+    INITIAL_CAPITAL: 'The initial capital is the amount you already have available to start investing.',
+    MONTHLY_CONTRIBUTION: 'The amount you intend to invest each month in addition to your initial capital.',
+    EXPECTED_RETURN: 'The expected average annual return of the ETF, based on historical data.',
+    VOLATILITY: 'It measures the variability of returns. The higher it is, the more the results can vary.',
+    INFLATION: 'The inflation rate reduces purchasing power over time.',
+    TAXES: 'Capital gains taxes you will have to pay on earnings.',
+    MONTE_CARLO: 'It simulates thousands of different scenarios to assess the probability of success.'
   },
   
-  // Thresholds per la valutazione del rischio
+  // Risk assessment thresholds
   RISK_THRESHOLDS: {
     LOW: { volatility: 10, return: 5 },
     MEDIUM: { volatility: 15, return: 7 },
@@ -175,5 +175,5 @@ const CONFIG = {
   }
 };
 
-// Utility per accedere alla configurazione
+// Utility to access the configuration
 window.CONFIG = CONFIG;

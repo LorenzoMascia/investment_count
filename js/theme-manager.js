@@ -1,6 +1,6 @@
 class ThemeManager {
   static init() {
-    // Controlla se c'è una preferenza salvata
+    // Check if there is a saved preference
     const savedTheme = localStorage.getItem('themePreference');
     const darkToggle = document.getElementById('darkToggle');
     
@@ -11,7 +11,7 @@ class ThemeManager {
       document.body.setAttribute('data-theme', 'light');
       darkToggle.checked = false;
     } else {
-      // Usa la preferenza del sistema
+      // Use system preference
       this.setSystemPreference();
     }
   }

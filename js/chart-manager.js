@@ -19,7 +19,7 @@ const ChartManager = {
                 labels: [],
                 datasets: []
             },
-            options: this.getPieChartOptions('Composizione Finale')
+            options: this.getPieChartOptions('Final Composition')
         });
 
         this.charts.returns = this.createChart('returnsChart', {
@@ -34,7 +34,7 @@ const ChartManager = {
         this.charts.monteCarlo = this.createChart('monteCarloChart', {
             type: 'boxplot',
             data: {
-                labels: ['Distribuzione'],
+                labels: ['Distribution'],
                 datasets: []
             },
             options: this.getMonteCarloChartOptions()
@@ -45,7 +45,7 @@ const ChartManager = {
     createChart: function(canvasId, config) {
         const canvas = document.getElementById(canvasId);
         if (!canvas) {
-            console.error(`Canvas "${canvasId}" non trovato.`);
+            console.error(`Canvas "${canvasId}" not found.`);
             return null;
         }
 
@@ -75,7 +75,7 @@ const ChartManager = {
         this.charts.main.data.labels = labels;
         this.charts.main.data.datasets = [
             {
-                label: 'Valore Nominale',
+                label: 'Nominal Value',
                 data: values,
                 borderColor: 'rgba(75, 192, 192, 1)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -83,7 +83,7 @@ const ChartManager = {
                 fill: true
             },
             {
-                label: 'Valore Aggiustato per Inflazione',
+                label: 'Adjusted Value for Inflation',
                 data: inflationAdjustedValues,
                 borderColor: 'rgba(54, 162, 235, 1)',
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
@@ -92,7 +92,7 @@ const ChartManager = {
                 fill: false
             },
             {
-                label: 'Totale Investito',
+                label: 'Total Invested',
                 data: contributions,
                 borderColor: 'rgba(255, 99, 132, 1)',
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -103,7 +103,7 @@ const ChartManager = {
         this.charts.main.update();
     },
 
-    // Aggiorna il grafico a torta della composizione
+    // Update the pie chart of the composition
     updateCompositionChart: function(results) {
         if (!results || !results.baseProjection || results.baseProjection.length === 0) return;
 
@@ -112,10 +112,10 @@ const ChartManager = {
         const netProfit = finalYear.value - totalInvested;
 
         this.charts.composition.data.labels = [
-            'Capitale Investito',
-            'Guadagno Netto',
-            'Tasse Pagate',
-            'Commissioni Pagate'
+            'Invested Capital',
+            'Net Gain',
+            'Fees Paid',
+            'Commissions Paid'
         ];
 
         this.charts.composition.data.datasets = [{
@@ -142,7 +142,7 @@ const ChartManager = {
         this.charts.composition.update();
     },
 
-    // Aggiorna il grafico dei rendimenti annuali
+    // Update annual yield graph
     updateReturnsChart: function(projection) {
         if (!projection || projection.length === 0) return;
 
@@ -151,7 +151,7 @@ const ChartManager = {
 
         this.charts.returns.data.labels = labels;
         this.charts.returns.data.datasets = [{
-            label: 'Rendimento Annuale (%)',
+            label: 'Annual Yield (%)',
             data: returns,
             backgroundColor: returns.map(r => 
                 r > 0 ? 'rgba(75, 192, 192, 0.7)' : 'rgba(255, 99, 132, 0.7)'),
@@ -162,12 +162,12 @@ const ChartManager = {
         this.charts.returns.update();
     },
 
-    // Aggiorna il grafico Monte Carlo
+    // Update Monte Carlo Chart
     updateMonteCarloChart: function(monteCarloResults) {
         if (!monteCarloResults || !monteCarloResults.simulations) return;
 
         const datasets = [{
-            label: 'Distribuzione Risultati',
+            label: 'Distribution Results',
             backgroundColor: 'rgba(54, 162, 235, 0.7)',
             borderColor: 'rgba(54, 162, 235, 1)',
             borderWidth: 1,
@@ -179,7 +179,7 @@ const ChartManager = {
         this.charts.monteCarlo.update();
     },
 
-    // Resetta tutti i grafici
+    // Reset all graphics
     resetCharts: function() {
         Object.values(this.charts).forEach(chart => {
             if (chart) {
@@ -190,21 +190,21 @@ const ChartManager = {
         });
     },
 
-    // Cambia tipo di grafico principale
+    // Change main graphic type
     setType: function(type) {
         this.chartType = type;
         this.resetCharts();
         this.initCharts();
     },
 
-    // Resetta lo zoom su un grafico specifico
+    // Reset zoom on a specific graph
     resetZoom: function(chartId) {
         if (this.charts[chartId] && this.charts[chartId].resetZoom) {
             this.charts[chartId].resetZoom();
         }
     },
 
-    // Opzioni grafico principale
+    // Main Graph Options
     getMainChartOptions: function() {
         return {
             responsive: true,
@@ -233,7 +233,7 @@ const ChartManager = {
         };
     },
 
-    // Opzioni grafico a torta
+    // Pie chart options
     getPieChartOptions: function(title) {
         return {
             responsive: true,
@@ -255,13 +255,13 @@ const ChartManager = {
         };
     },
 
-    // Opzioni grafico rendimenti annuali
+    // Options graph annual returns
     getReturnsChartOptions: function() {
         return {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                title: { display: true, text: 'Rendimenti Annuale (%)' },
+                title: { display: true, text: 'Annual Yields (%)' },
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
@@ -272,22 +272,22 @@ const ChartManager = {
                 }
             },
             scales: {
-                x: { title: { display: true, text: 'Anno' } },
+                x: { title: { display: true, text: 'Year' } },
                 y: {
-                    title: { display: true, text: 'Rendimento (%)' },
+                    title: { display: true, text: 'Yield (%)' },
                     ticks: { callback: value => `${value.toFixed(0)}%` }
                 }
             }
         };
     },
 
-    // Opzioni grafico Monte Carlo
+    // Monte Carlo graphic options
     getMonteCarloChartOptions: function() {
         return {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                title: { display: true, text: 'Distribuzione Risultati Monte Carlo' },
+                title: { display: true, text: 'Monte Carlo Results Distribution' },
                 legend: { display: false }
             },
             scales: {

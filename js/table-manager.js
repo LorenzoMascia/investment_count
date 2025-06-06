@@ -1,11 +1,11 @@
 const TableManager = {
-    // Aggiorna la tabella con i risultati
+    // Update table with results
     updateTable: function(results) {
         const tableBody = document.getElementById('detailsTable');
         if (!results || !results.baseProjection) {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="4" class="text-center">Nessun dato disponibile</td>
+                    <td colspan="4" class="text-center">No data available</td>
                 </tr>
             `;
             return;
@@ -13,39 +13,39 @@ const TableManager = {
         const finalYear = results.baseProjection[results.baseProjection.length - 1];
         const metrics = [
             {
-                metric: "Valore Finale",
+                metric: "Final Value",
                 value: `€${finalYear.value.toLocaleString('it-IT', { maximumFractionDigits: 2 })}`,
-                details: "Totale investimento finale dopo tasse e commissioni",
+                details: "Total final investment after taxes and fees",
                 rating: this.getRating(finalYear.value / finalYear.totalInvested)
             },
             {
-                metric: "Capitale Investito Totale",
+                metric: "Total Invested Capital",
                 value: `€${finalYear.totalInvested.toLocaleString('it-IT', { maximumFractionDigits: 2 })}`,
-                details: "Somma iniziale più contributi mensili accumulati",
+                details: "SInitial sum plus accumulated monthly contributions",
                 rating: this.getRating(finalYear.totalInvested / finalYear.value)
             },
             {
-                metric: "Guadagno Netto",
+                metric: "Net Gain",
                 value: `€${(finalYear.value - finalYear.totalInvested).toLocaleString('it-IT', { maximumFractionDigits: 2 })}`,
-                details: "Guadagno lordo meno tasse pagate",
+                details: "Gross earnings minus taxes paid",
                 rating: this.getRating((finalYear.value - finalYear.totalInvested) / finalYear.totalInvested)
             },
             {
-                metric: "Tasso Crescita Annuale Composto (CAGR)",
+                metric: "Compound Annual Growth Rate (CAGR)",
                 value: `${(results.cagr * 100).toFixed(2)}%`,
-                details: "Percentuale media annua di crescita composta",
+                details: "Average annual percentage of compound growth",
                 rating: this.getRating(results.cagr * 100)
             },
             {
-                metric: "Volatilità Effettiva",
+                metric: "Effective Volatility",
                 value: `${(results.actualVolatility * 100).toFixed(2)}%`,
-                details: "Deviazione standard dei rendimenti annuali",
+                details: "Standard deviation of annual returns",
                 rating: this.getRating(results.actualVolatility * 100)
             },
             {
-                metric: "Massimo Drawdown",
+                metric: "Maximum Drawdown",
                 value: `${(results.maxDrawdown * 100).toFixed(2)}%`,
-                details: "Massima perdita rispetto al picco storico",
+                details: "Maximum loss compared to historical peak",
                 rating: this.getRating(results.maxDrawdown * 100)
             }
         ];
@@ -86,7 +86,7 @@ const TableManager = {
         link.setAttribute('download', 'report_simulazione.csv');
         link.click();
     },
-    // Valuta un valore e restituisce una valutazione
+    // Evaluates a value and returns an evaluation
     getRating: function(value) {
         let ratingClass, ratingText;
         if (typeof value === 'string') {
@@ -94,16 +94,16 @@ const TableManager = {
         }
         if (value > 0 && value <= 10) {
             ratingClass = 'success';
-            ratingText = 'Eccellente';
+            ratingText = 'Excellent';
         } else if (value <= 25) {
             ratingClass = 'primary';
-            ratingText = 'Buono';
+            ratingText = 'Good';
         } else if (value <= 50) {
             ratingClass = 'warning';
-            ratingText = 'Medio';
+            ratingText = 'Medium';
         } else {
             ratingClass = 'danger';
-            ratingText = 'Basso';
+            ratingText = 'Low';
         }
         return { class: ratingClass, text: ratingText };
     }

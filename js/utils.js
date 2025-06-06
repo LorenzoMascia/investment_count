@@ -1,26 +1,30 @@
 // Utility functions
 const Utils = {
-  // Formattazione valuta
+  // Currency formatting
   formatCurrency(value, options = {}) {
     const opts = { style: 'currency', currency: 'EUR', ...CONFIG.FORMATS.CURRENCY, ...options };
-    return new Intl.NumberFormat('it-IT', opts).format(value);
+    return new Intl.NumberFormat('en-US', opts).format(value);
   },
-  // Formattazione percentuale
+  
+  // Percentage formatting
   formatPercentage(value, options = {}) {
     const opts = { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2, ...options };
-    return new Intl.NumberFormat('it-IT', opts).format(value / 100);
+    return new Intl.NumberFormat('en-US', opts).format(value / 100);
   },
-  // Formattazione numero
+  
+  // Number formatting
   formatNumber(value, options = {}) {
     const opts = { ...CONFIG.FORMATS.NUMBER, ...options };
-    return new Intl.NumberFormat('it-IT', opts).format(value);
+    return new Intl.NumberFormat('en-US', opts).format(value);
   },
-  // Formattazione data
+  
+  // Date formatting
   formatDate(date, options = {}) {
     const opts = { year: 'numeric', month: 'long', day: 'numeric', ...options };
-    return new Intl.DateTimeFormat('it-IT', opts).format(new Date(date));
+    return new Intl.DateTimeFormat('en-US', opts).format(new Date(date));
   },
-  // Validazione input
+  
+  // Input validation
   validateInput(value, type, min = null, max = null, allowNegative = false) {
     if (value === '' || value === null || value === undefined) {
       return { valid: false, message: CONFIG.VALIDATION_MESSAGES.REQUIRED };
@@ -40,6 +44,7 @@ const Utils = {
     }
     return { valid: true, value: numValue };
   },
+  
   // Deep clone object
   deepClone(obj) {
     if (obj === null || typeof obj !== 'object') return obj;
@@ -53,12 +58,13 @@ const Utils = {
     }
     return clonedObj;
   },
+  
   // Smooth scroll
   smoothScroll(element, to, duration = 500) {
     const start = element.scrollTop;
     const change = to - start;
     const startTime = performance.now();
-    const animateScroll = (currentTime) => {310
+    const animateScroll = (currentTime) => {
       const timeElapsed = currentTime - startTime;
       const progress = Math.min(timeElapsed / duration, 1);
       element.scrollTop = start + change * this.easeInOutQuad(progress);
@@ -66,9 +72,11 @@ const Utils = {
     };
     requestAnimationFrame(animateScroll.bind(this));
   },
+  
   easeInOutQuad(t) {
     return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
   },
+  
   showToast(message, type = 'info', duration = 3000) {
     const toast = document.createElement('div');
     toast.className = `toast align-items-center text-white bg-${type} border-0`;
@@ -92,6 +100,7 @@ const Utils = {
     bsToast.show();
     toast.addEventListener('hidden.bs.toast', () => toast.remove());
   },
+  
   showAlert(message, type = 'info', dismissible = true) {
     const alertContainer = document.getElementById('alertContainer');
     if (!alertContainer) return;
@@ -115,6 +124,7 @@ const Utils = {
     }
     return alertId;
   },
+  
   hideAlert(alertId) {
     const alert = document.getElementById(alertId);
     if (alert) {
@@ -122,17 +132,21 @@ const Utils = {
       bsAlert.close();
     }
   },
+  
   generateId() {
     return 'id_' + Math.random().toString(36).substr(2, 9);
   },
+  
   average(arr) {
     return arr.reduce((sum, val) => sum + val, 0) / arr.length;
   },
+  
   standardDeviation(arr) {
     const avg = this.average(arr);
     const squaredDiffs = arr.map(val => Math.pow(val - avg, 2));
     return Math.sqrt(this.average(squaredDiffs));
   },
+  
   percentile(arr, p) {
     const sorted = [...arr].sort((a, b) => a - b);
     const index = (p / 100) * (sorted.length - 1);
@@ -140,6 +154,7 @@ const Utils = {
     const lower = Math.floor(index), upper = Math.ceil(index), weight = index - lower;
     return sorted[lower] * (1 - weight) + sorted[upper] * weight;
   },
+  
   generateColors(count) {
     const colors = [];
     for (let i = 0; i < count; i++) {
@@ -148,6 +163,7 @@ const Utils = {
     }
     return colors;
   },
+  
   loadFile(accept = '*/*') {
     return new Promise((resolve, reject) => {
       const input = document.createElement('input');
@@ -155,7 +171,7 @@ const Utils = {
       input.accept = accept;
       input.onchange = (e) => {
         const file = e.target.files[0];
-        if (!file) return reject(new Error('Nessun file selezionato'));
+        if (!file) return reject(new Error('No file selected'));
         const reader = new FileReader();
         reader.onload = (e) => resolve({
           name: file.name,
@@ -163,12 +179,13 @@ const Utils = {
           type: file.type,
           size: file.size
         });
-        reader.onerror = () => reject(new Error('Errore nella lettura del file'));
+        reader.onerror = () => reject(new Error('Error reading file'));
         reader.readAsText(file);
       };
       input.click();
     });
   },
+  
   saveFile(content, filename, type = 'text/plain') {
     const blob = new Blob([content], { type });
     const url = URL.createObjectURL(blob);
@@ -180,11 +197,12 @@ const Utils = {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   },
+  
   async copyToClipboard(text) {
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(text);
-        this.showToast('Copiato negli appunti!', 'success');
+        this.showToast('Copied to clipboard!', 'success');
       } else {
         const textArea = document.createElement('textarea');
         textArea.value = text;
@@ -192,12 +210,13 @@ const Utils = {
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
-        this.showToast('Copiato negli appunti!', 'success');
+        this.showToast('Copied to clipboard!', 'success');
       }
     } catch (err) {
-      this.showToast('Errore nella copia', 'danger');
+      this.showToast('Copy error', 'danger');
     }
   },
+  
   storage: {
     set(key, value) {
       try {
@@ -209,6 +228,7 @@ const Utils = {
         return false;
       }
     },
+    
     get(key, defaultValue = null) {
       try {
         const data = localStorage.getItem(key);
@@ -217,6 +237,7 @@ const Utils = {
         return window._tempStorage?.[key] ?? defaultValue;
       }
     },
+    
     remove(key) {
       try {
         localStorage.removeItem(key);
@@ -224,6 +245,7 @@ const Utils = {
         if (window._tempStorage) delete window._tempStorage[key];
       }
     },
+    
     clear() {
       try {
         localStorage.clear();

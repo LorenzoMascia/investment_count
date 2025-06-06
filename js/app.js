@@ -1,18 +1,18 @@
-// Inizializzazione dell'applicazione
+// Application initialisation
 document.addEventListener('DOMContentLoaded', function() {
-    // Inizializza il tema
+    // Initialise theme
     ThemeManager.init();
     
-    // Imposta la data di inizio predefinita a oggi
+    // Set default start date to today
     document.getElementById('startDate').valueAsDate = new Date();
     
-    // Carica eventuali configurazioni salvate
+    // Load any saved configurations
     ETFSimulator.loadConfiguration();
     
-    // Aggiorna le statistiche rapide
+    // Update Quick Statistics
     ETFSimulator.updateQuickStats();
     
-    // Aggiungi tooltip
+    // Add tooltip
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-tooltip]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);

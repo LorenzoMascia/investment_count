@@ -1,19 +1,19 @@
 const Calculator = {
-    // Calcola l'investimento
+    // Calculate your investment
     calculateInvestment: function(params) {
-        // Calcola il percorso base
+        // Calculate basic route
         const baseProjection = this.calculateBaseProjection(params);
         
-        // Se richiesto, calcola anche la simulazione Monte Carlo
+        // If required, it also calculates the Monte Carlo simulation
         let monteCarloResults = null;
         if (params.enableMonteCarloMode) {
             monteCarloResults = this.runMonteCarloSimulation(params, 100);
         }
         
-        // Calcola le milestone
+        // Calculate milestones
         const milestones = this.calculateMilestones(baseProjection);
         
-        // Calcola le metriche riassuntive
+        // Calculate summary metrics
         const metrics = this.calculateMetrics(baseProjection, params);
         
         return {
@@ -25,7 +25,7 @@ const Calculator = {
         };
     },
     
-    // Calcola la proiezione base
+    // Calculate base projection
     calculateBaseProjection: function(params) {
         const projection = [];
         let currentValue = params.initialCapital;
@@ -34,7 +34,7 @@ const Calculator = {
         let totalTaxesPaid = 0;
         let previousYearValue = params.initialCapital;
         
-        // Data di inizio
+        // Start date
         let currentDate = new Date(params.startDate || new Date());
         
         for (let year = 1; year <= params.years; year++) {
@@ -43,30 +43,30 @@ const Calculator = {
             let yearlyFees = 0;
             let yearlyTaxes = 0;
             
-            // Simula ogni mese
+            // Simulates each month
             for (let month = 1; month <= 12; month++) {
-                // Aggiungi il contributo mensile
+                // Add monthly contribution
                 yearlyContributions += currentContribution;
                 totalInvested += currentContribution;
                 currentValue += currentContribution;
                 
-                // Calcola il rendimento mensile con volatilità
+                // Calculate monthly return with volatility
                 const monthlyReturn = this.calculateMonthlyReturn(params.expectedReturn, params.volatility);
                 const monthlyGain = currentValue * monthlyReturn;
                 
                 yearlyGain += monthlyGain;
                 currentValue += monthlyGain;
                 
-                // Calcola e sottrai le commissioni di gestione mensili
+                // Calculate and subtract monthly management fees
                 const monthlyFee = currentValue * (params.managementFees / 12);
                 yearlyFees += monthlyFee;
                 currentValue -= monthlyFee;
                 
-                // Aggiorna la data
+                // Update date
                 currentDate.setMonth(currentDate.getMonth() + 1);
             }
             
-            // Calcola e paga le tasse sui guadagni (solo se ci sono plusvalenze)
+            // Calculate and pay taxes on gains (only if there are capital gains)
             const yearEndValueBeforeTax = currentValue;
             const yearlyNetGain = yearEndValueBeforeTax - previousYearValue - yearlyContributions;
             
@@ -76,18 +76,18 @@ const Calculator = {
                 totalTaxesPaid += yearlyTaxes;
             }
             
-            // Aggiusta per l'inflazione se richiesto
+            // Adjust for inflation if required
             let inflationAdjustedValue = currentValue;
             if (params.includeInflationAdjustment) {
                 inflationAdjustedValue = currentValue / Math.pow(1 + params.inflationRate, year);
             }
             
-            // Aumenta il contributo mensile per l'anno successivo in base alla crescita
+            // Increase the monthly contribution for the following year based on growth
             if (params.contributionGrowth > 0) {
                 currentContribution *= (1 + params.contributionGrowth);
             }
             
-            // Salva i dati annuali
+            // Save annual data
             projection.push({
                 year: year,
                 date: new Date(currentDate),
@@ -108,16 +108,16 @@ const Calculator = {
         return projection;
     },
     
-    // Calcola il rendimento mensile con volatilità
+    // Calculate monthly return with volatility
     calculateMonthlyReturn: function(expectedAnnualReturn, volatility) {
-        // Converti i parametri annuali in mensili
+        // Convert annual parameters to monthly
         const expectedMonthlyReturn = Math.pow(1 + expectedAnnualReturn, 1/12) - 1;
         const monthlyVolatility = volatility / Math.sqrt(12);
         
-        // Simula un rendimento casuale con distribuzione normale
+        // Simulates a random return with normal distribution
         let monthlyReturn;
         do {
-            // Usa il metodo Box-Muller per generare una distribuzione normale
+            // Use the Box-Muller method to generate a normal distribution
             let u1 = Math.random();
             let u2 = Math.random();
             let z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
@@ -128,7 +128,7 @@ const Calculator = {
         return monthlyReturn;
     },
     
-    // Esegue una simulazione Monte Carlo
+    // Runs a Monte Carlo simulation
     runMonteCarloSimulation: function(params, simulationsCount = 100) {
         const results = [];
         
@@ -141,7 +141,7 @@ const Calculator = {
             });
         }
         
-        // Ordina i risultati per valore finale
+        // Sort results by final value
         results.sort((a, b) => a.finalValue - b.finalValue);
         
         return {
@@ -150,7 +150,7 @@ const Calculator = {
         };
     },
     
-    // Calcola il massimo drawdown
+    // Calculate maximum drawdown
     calculateMaxDrawdown: function(values) {
         let peak = values[0];
         let maxDrawdown = 0;
@@ -169,7 +169,7 @@ const Calculator = {
         return maxDrawdown;
     },
     
-    // Calcola i percentili
+    // Calculate percentiles
     calculatePercentiles: function(values) {
         return {
             p5: values[Math.floor(values.length * 0.05)],
@@ -180,20 +180,20 @@ const Calculator = {
         };
     },
     
-    // Calcola le milestone significative
+    // Calculate significant milestones
     calculateMilestones: function(projection) {
         const milestones = [];
         const finalValue = projection[projection.length - 1].value;
         
-        // Aggiungi milestone per raddoppi, triplo, etc. del capitale iniziale
+        // Add milestones for doubles, triples, etc. of initial capital
         const initialCapital = projection[0].contributions;
         for (let multiple = 2; multiple <= 10; multiple++) {
             const target = initialCapital * multiple;
-            const milestone = this.findMilestone(projection, target, `${multiple}x Capitale Iniziale`);
+            const milestone = this.findMilestone(projection, target, `${multiple}x Initial Capital`);
             if (milestone) milestones.push(milestone);
         }
         
-        // Aggiungi milestone per valori tondi (100k, 250k, 500k, 1M, etc.)
+        // Add milestones for round values (100k, 250k, 500k, 1M, etc.)
         const roundValues = [50000, 100000, 250000, 500000, 750000, 1000000, 1500000, 2000000];
         for (const value of roundValues) {
             if (value < finalValue) {
@@ -201,18 +201,17 @@ const Calculator = {
                 if (milestone) milestones.push(milestone);
             }
         }
-        
-        // Aggiungi milestone per metà del valore finale
+        // Add milestones for half the final value
         const halfFinal = finalValue / 2;
         if (halfFinal > initialCapital) {
-            const milestone = this.findMilestone(projection, halfFinal, "50% del Valore Finale");
+            const milestone = this.findMilestone(projection, halfFinal, "50% of Final Value");
             if (milestone) milestones.push(milestone);
         }
         
         return milestones.sort((a, b) => a.year - b.year);
     },
     
-    // Trova una milestone specifica nella proiezione
+    // Find a specific milestone in the projection
     findMilestone: function(projection, targetValue, name) {
         for (const yearData of projection) {
             if (yearData.value >= targetValue) {
@@ -227,7 +226,7 @@ const Calculator = {
         return null;
     },
     
-    // Calcola le metriche riassuntive
+    // Calculate summary metrics
     calculateMetrics: function(projection, params) {
         const finalYear = projection[projection.length - 1];
         const initialCapital = params.initialCapital;
@@ -235,19 +234,19 @@ const Calculator = {
         const finalValue = finalYear.value;
         const netProfit = finalValue - totalInvested;
         
-        // Calcola il CAGR (Compound Annual Growth Rate)
+        // Calculate the CAGR (Compound Annual Growth Rate)
         const cagr = Math.pow(finalValue / initialCapital, 1 / params.years) - 1;
         
-        // Calcola il rendimento medio annuo
+        // Calculate the average annual yield
         const annualReturns = projection.map(y => y.returnPercentage);
         const averageReturn = annualReturns.reduce((sum, r) => sum + r, 0) / annualReturns.length;
         
-        // Calcola la volatilità effettiva (deviazione standard dei rendimenti)
+         // Calculate effective volatility (standard deviation of returns)
         const squaredDiffs = annualReturns.map(r => Math.pow(r - averageReturn, 2));
         const variance = squaredDiffs.reduce((sum, sd) => sum + sd, 0) / squaredDiffs.length;
         const actualVolatility = Math.sqrt(variance);
         
-        // Calcola il rapporto rischio/rendimento (Sharpe ratio semplificato)
+        // Calculates the risk/return ratio (simplified Sharpe ratio)
         const sharpeRatio = (averageReturn - (params.inflationRate * 100)) / actualVolatility;
         
         return {

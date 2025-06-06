@@ -1,10 +1,10 @@
 class ExportManager {
   static exportReport() {
     try {
-      // Creazione del report in formato HTML
+      // Creation of the report in HTML format
       const reportContent = this.generateReportContent();
       
-      // Creazione del blob e download
+      // Blob creation and download
       const blob = new Blob([reportContent], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -15,10 +15,10 @@ class ExportManager {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      Utils.showAlert('Report esportato con successo!', 'success');
+      Utils.showAlert('Report successfully exported!', 'success');
     } catch (error) {
-      console.error('Errore durante l\'esportazione:', error);
-      Utils.showAlert('Errore durante l\'esportazione del report', 'danger');
+      console.error('Error during export:', error);
+      Utils.showAlert('Error during report export', 'danger');
     }
   }
 
@@ -41,7 +41,7 @@ class ExportManager {
     return `<!DOCTYPE html>
 <html>
 <head>
-  <title>Report Simulazione ETF</title>
+  <title>Report Simulation ETF</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     .header { text-align: center; margin-bottom: 30px; }
@@ -55,11 +55,11 @@ class ExportManager {
 </head>
 <body>
   <div class="header">
-    <h1>Report Simulazione ETF</h1>
-    <p>Generato il ${date}</p>
+    <h1>ETF Simulation Report</h1>
+    <p>Generated on ${date}</p>
   </div>
   
-  <h2>Configurazione</h2>
+  <h2>Configuration</h2>
   <table class="config-table">
     ${Object.entries(config).map(([key, value]) => `
       <tr>
@@ -69,11 +69,11 @@ class ExportManager {
     `).join('')}
   </table>
   
-  <h2>Grafici</h2>
+  <h2>Charts</h2>
   ${chartsHTML}
   
   <div class="footer">
-    Report generato con Simulatore ETF Professionale
+    Report generated with Professional ETF Simulator
   </div>
 </body>
 </html>`;
@@ -111,10 +111,10 @@ class ExportManager {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      Utils.showAlert('Dati esportati in CSV con successo!', 'success');
+      Utils.showAlert('Data exported to CSV successfully!', 'success');
     } catch (error) {
-      console.error('Errore durante l\'esportazione CSV:', error);
-      Utils.showAlert('Errore durante l\'esportazione CSV', 'danger');
+      console.error('Error during export CSV:', error);
+      Utils.showAlert('Error during export CSV', 'danger');
     }
   }
 }

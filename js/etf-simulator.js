@@ -1,12 +1,12 @@
 const ETFSimulator = {
-    // Esegue la simulazione
+    // Run the simulation
     run: function() {
         try {
-            // Mostra lo spinner di caricamento
+            // Show loading spinner
             document.getElementById('loadingSpinner').style.display = 'flex';
             document.getElementById('chartsContainer').style.opacity = '0.5';
             
-            // Simula un caricamento progressivo
+            // Simulate progressive loading
             let progress = 0;
             const progressInterval = setInterval(() => {
                 progress += 5;
@@ -14,31 +14,31 @@ const ETFSimulator = {
                 if (progress >= 100) clearInterval(progressInterval);
             }, 100);
             
-            // Recupera i parametri di input
+            // Get input parameters
             const params = this.getInputParameters();
             
-            // Simula un ritardo per il calcolo
+            // Simulate calculation delay
             setTimeout(() => {
-                // Esegui il calcolo
+                // Perform calculation
                 const results = Calculator.calculateInvestment(params);
                 
-                // Aggiorna l'interfaccia con i risultati
+                // Update UI with results
                 this.updateUI(results);
                 
-                // Nascondi lo spinner
+                // Hide spinner
                 document.getElementById('loadingSpinner').style.display = 'none';
                 document.getElementById('chartsContainer').style.opacity = '1';
                 clearInterval(progressInterval);
             }, 1500);
         } catch (error) {
-            console.error("Errore durante la simulazione:", error);
-            this.showAlert("Si è verificato un errore durante la simulazione.", "danger");
+            console.error("Error during simulation:", error);
+            this.showAlert("An error occurred during the simulation.", "danger");
             document.getElementById('loadingSpinner').style.display = 'none';
             document.getElementById('chartsContainer').style.opacity = '1';
         }
     },
     
-    // Recupera i parametri di input dal form
+    // Get input parameters from form
     getInputParameters: function() {
         return {
             initialCapital: parseFloat(document.getElementById('initialCapital').value),
@@ -58,44 +58,44 @@ const ETFSimulator = {
         };
     },
     
-    // Aggiorna l'interfaccia con i risultati
+    // Update UI with results
     updateUI: function(results) {
-        // Aggiorna le statistiche rapide
+        // Update quick stats
         this.updateQuickStats(results);
         
-        // Aggiorna i grafici
+        // Update charts
         ChartManager.updateCharts(results);
         
-        // Aggiorna la tabella di dettaglio
+        // Update detail table
         TableManager.updateTable(results);
         
-        // Aggiorna le milestone
+        // Update milestones
         this.updateMilestones(results);
         
-        // Mostra/nascondi la sezione Monte Carlo se necessario
+        // Show/hide Monte Carlo section if needed
         document.getElementById('monteCarloContainer').style.display = 
             results.params.enableMonteCarloMode ? 'block' : 'none';
     },
     
-    // Aggiorna le statistiche rapide
+    // Update quick stats
     updateQuickStats: function(results) {
         const quickStatsContainer = document.getElementById('quickStats');
         
         if (!results) {
-            // Statistiche preliminari basate solo sugli input
+            // Preliminary stats based only on inputs
             const params = this.getInputParameters();
             const totalContributions = params.monthlyContribution * 12 * params.years;
             
             quickStatsContainer.innerHTML = `
                 <div class="col-6">
                     <div class="stat-card">
-                        <h6>Capitale Iniziale</h6>
+                        <h6>Initial Capital</h6>
                         <p>€${params.initialCapital.toLocaleString('it-IT')}</p>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="stat-card">
-                        <h6>Totale Versato</h6>
+                        <h6>Total Contributed</h6>
                         <p>€${totalContributions.toLocaleString('it-IT')}</p>
                     </div>
                 </div>
@@ -103,23 +103,23 @@ const ETFSimulator = {
             return;
         }
         
-        // Statistiche complete con risultati della simulazione
+        // Complete stats with simulation results
         quickStatsContainer.innerHTML = `
             <div class="col-6 col-md-3">
                 <div class="stat-card">
-                    <h6>Valore Finale</h6>
+                    <h6>Final Value</h6>
                     <p>€${results.finalValue.toLocaleString('it-IT', {maximumFractionDigits: 2})}</p>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="stat-card">
-                    <h6>Totale Investito</h6>
+                    <h6>Total Invested</h6>
                     <p>€${results.totalInvested.toLocaleString('it-IT', {maximumFractionDigits: 2})}</p>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="stat-card">
-                    <h6>Guadagno Netto</h6>
+                    <h6>Net Profit</h6>
                     <p>€${results.netProfit.toLocaleString('it-IT', {maximumFractionDigits: 2})}</p>
                 </div>
             </div>
@@ -131,39 +131,39 @@ const ETFSimulator = {
             </div>
         `;
         
-        // Aggiorna la valutazione del rischio
+        // Update risk assessment
         this.updateRiskAssessment(results);
     },
     
-    // Aggiorna la valutazione del rischio
+    // Update risk assessment
     updateRiskAssessment: function(results) {
         const riskContainer = document.getElementById('riskAssessment');
         if (!results) {
-            riskContainer.innerHTML = '<div class="alert alert-info">Esegui una simulazione per valutare il rischio.</div>';
+            riskContainer.innerHTML = '<div class="alert alert-info">Run a simulation to assess risk.</div>';
             return;
         }
         
-        // Calcola un punteggio di rischio semplificato
+        // Calculate a simplified risk score
         const volatilityScore = results.params.volatility * 10;
         const yearsScore = 100 - (results.params.years * 2);
         const riskScore = Math.min(100, Math.max(0, (volatilityScore + yearsScore) / 2));
         
         let riskLevel, riskClass;
         if (riskScore < 30) {
-            riskLevel = "Basso";
+            riskLevel = "Low";
             riskClass = "success";
         } else if (riskScore < 70) {
-            riskLevel = "Moderato";
+            riskLevel = "Moderate";
             riskClass = "warning";
         } else {
-            riskLevel = "Alto";
+            riskLevel = "High";
             riskClass = "danger";
         }
         
         riskContainer.innerHTML = `
             <div class="risk-meter mb-3">
                 <div class="d-flex justify-content-between mb-1">
-                    <span>Rischio</span>
+                    <span>Risk</span>
                     <span>${riskLevel} (${Math.round(riskScore)}/100)</span>
                 </div>
                 <div class="progress">
@@ -173,34 +173,34 @@ const ETFSimulator = {
                 </div>
             </div>
             <div class="risk-factors">
-                <h6>Fattori di Rischio:</h6>
+                <h6>Risk Factors:</h6>
                 <ul>
-                    <li>Volatilità: ${Math.round(results.params.volatility * 100)}%</li>
-                    <li>Orizzonte temporale: ${results.params.years} anni</li>
-                    <li>Tipo ETF: ${this.getETFTypeName(results.params.etfType)}</li>
+                    <li>Volatility: ${Math.round(results.params.volatility * 100)}%</li>
+                    <li>Time horizon: ${results.params.years} years</li>
+                    <li>ETF Type: ${this.getETFTypeName(results.params.etfType)}</li>
                 </ul>
             </div>
         `;
     },
     
-    // Restituisce il nome descrittivo del tipo ETF
+    // Returns descriptive name of ETF type
     getETFTypeName: function(type) {
         const types = {
-            'world': 'Azionario Mondo',
+            'world': 'Global Equity',
             'sp500': 'S&P 500',
-            'europe': 'Azionario Europa',
-            'emerging': 'Mercati Emergenti',
-            'bonds': 'Obbligazionario',
-            'mixed': 'Bilanciato 60/40'
+            'europe': 'European Equity',
+            'emerging': 'Emerging Markets',
+            'bonds': 'Bonds',
+            'mixed': 'Balanced 60/40'
         };
         return types[type] || type;
     },
     
-    // Aggiorna le milestone
+    // Update milestones
     updateMilestones: function(results) {
         const container = document.getElementById('milestonesContainer');
         if (!results || !results.milestones) {
-            container.innerHTML = '<div class="alert alert-secondary">Nessuna milestone disponibile.</div>';
+            container.innerHTML = '<div class="alert alert-secondary">No milestones available.</div>';
             return;
         }
         
@@ -217,8 +217,8 @@ const ETFSimulator = {
                             <span>€${milestone.value.toLocaleString('it-IT', {maximumFractionDigits: 2})}</span>
                         </div>
                         <div class="d-flex justify-content-between small text-muted mb-2">
-                            <span>Anno ${milestone.year}</span>
-                            <span>${milestone.percentage}% del finale</span>
+                            <span>Year ${milestone.year}</span>
+                            <span>${milestone.percentage}% of final</span>
                         </div>
                         <div class="progress" style="height: 8px;">
                             <div class="progress-bar ${progressClass}" role="progressbar" 
@@ -229,7 +229,7 @@ const ETFSimulator = {
                 </div>
             `;
             
-            // Aggiungi una riga ogni 2 milestone
+            // Add a row every 2 milestones
             if (index % 2 === 1 && index !== results.milestones.length - 1) {
                 html += '</div><div class="row">';
             }
@@ -239,7 +239,7 @@ const ETFSimulator = {
         container.innerHTML = html;
     },
     
-    // Mostra un alert
+    // Show an alert
     showAlert: function(message, type = 'info', duration = 5000) {
         const alertContainer = document.getElementById('alertContainer');
         const alertId = 'alert-' + Date.now();
@@ -255,7 +255,7 @@ const ETFSimulator = {
         
         alertContainer.appendChild(alert);
         
-        // Rimuovi l'alert dopo un po' di tempo
+        // Remove alert after some time
         if (duration > 0) {
             setTimeout(() => {
                 const alertToRemove = document.getElementById(alertId);
@@ -266,9 +266,9 @@ const ETFSimulator = {
         }
     },
     
-    // Resetta il simulatore
+    // Reset the simulator
     reset: function() {
-        // Resetta i valori di input ai default
+        // Reset input values to defaults
         document.getElementById('initialCapital').value = 10000;
         document.getElementById('monthlyContribution').value = 500;
         document.getElementById('investmentYears').value = 20;
@@ -285,21 +285,21 @@ const ETFSimulator = {
         document.getElementById('includeInflationAdjustment').checked = true;
         document.getElementById('enableMonteCarloMode').checked = false;
         
-        // Resetta i risultati
+        // Reset results
         document.getElementById('quickStats').innerHTML = '';
         document.getElementById('riskAssessment').innerHTML = '';
         document.getElementById('milestonesContainer').innerHTML = '';
         
-        // Resetta i grafici
+        // Reset charts
         ChartManager.resetCharts();
         
-        // Resetta la tabella
+        // Reset table
         TableManager.resetTable();
         
-        this.showAlert("Simulatore resettato ai valori predefiniti.", "success");
+        this.showAlert("Simulator reset to default values.", "success");
     },
     
-    // Salva la configurazione corrente
+    // Save current configuration
     saveConfiguration: function() {
         const config = {
             inputs: this.getInputParameters(),
@@ -307,21 +307,21 @@ const ETFSimulator = {
         };
         
         localStorage.setItem('etfSimulatorConfig', JSON.stringify(config));
-        this.showAlert("Configurazione salvata con successo.", "success");
+        this.showAlert("Configuration saved successfully.", "success");
     },
     
-    // Carica una configurazione salvata
+    // Load saved configuration
     loadConfiguration: function() {
         const savedConfig = localStorage.getItem('etfSimulatorConfig');
         if (!savedConfig) {
-            this.showAlert("Nessuna configurazione salvata trovata.", "warning");
+            this.showAlert("No saved configuration found.", "warning");
             return;
         }
         
         try {
             const config = JSON.parse(savedConfig);
             
-            // Imposta i valori dai dati salvati
+            // Set values from saved data
             document.getElementById('initialCapital').value = config.inputs.initialCapital;
             document.getElementById('monthlyContribution').value = config.inputs.monthlyContribution;
             document.getElementById('investmentYears').value = config.inputs.years;
@@ -338,45 +338,45 @@ const ETFSimulator = {
             document.getElementById('includeInflationAdjustment').checked = config.inputs.includeInflationAdjustment;
             document.getElementById('enableMonteCarloMode').checked = config.inputs.enableMonteCarloMode;
             
-            this.showAlert(`Configurazione caricata (salvata il ${new Date(config.timestamp).toLocaleString()}).`, "success");
+            this.showAlert(`Configuration loaded (saved on ${new Date(config.timestamp).toLocaleString()}).`, "success");
             this.updateQuickStats();
         } catch (error) {
-            console.error("Errore nel caricamento della configurazione:", error);
-            this.showAlert("Errore nel caricamento della configurazione salvata.", "danger");
+            console.error("Error loading configuration:", error);
+            this.showAlert("Error loading saved configuration.", "danger");
         }
     },
     
-    // Esporta un report
+    // Export a report
     exportReport: function() {
         ExportManager.generatePDF();
     },
     
-    // Mostra la guida
+    // Show help
     showHelp: function() {
         const helpContent = document.getElementById('helpContent');
         helpContent.innerHTML = `
-            <h6>Come utilizzare il simulatore</h6>
-            <p>Il simulatore ETF ti permette di proiettare la crescita del tuo investimento nel tempo, considerando diversi parametri:</p>
+            <h6>How to use the simulator</h6>
+            <p>The ETF simulator allows you to project the growth of your investment over time, considering various parameters:</p>
             
-            <h6 class="mt-4">Parametri Base</h6>
+            <h6 class="mt-4">Basic Parameters</h6>
             <ul>
-                <li><strong>Capitale Iniziale</strong>: L'importo iniziale che vuoi investire.</li>
-                <li><strong>Contributo Mensile</strong>: L'importo che aggiungerai ogni mese all'investimento.</li>
-                <li><strong>Durata</strong>: Il numero di anni per cui vuoi simulare l'investimento.</li>
-                <li><strong>Rendimento Atteso</strong>: Il rendimento annuale medio che ti aspetti dal tuo investimento.</li>
+                <li><strong>Initial Capital</strong>: The initial amount you want to invest.</li>
+                <li><strong>Monthly Contribution</strong>: The amount you'll add to your investment each month.</li>
+                <li><strong>Duration</strong>: The number of years you want to simulate the investment for.</li>
+                <li><strong>Expected Return</strong>: The average annual return you expect from your investment.</li>
             </ul>
             
-            <h6 class="mt-4">Parametri Avanzati</h6>
+            <h6 class="mt-4">Advanced Parameters</h6>
             <ul>
-                <li><strong>Crescita Contributo Annuale</strong>: Di quanto aumenterà il tuo contributo mensile ogni anno.</li>
-                <li><strong>Costi Gestione</strong>: La percentuale annua di costi del fondo (TER).</li>
-                <li><strong>Volatilità</strong>: Quanto è variabile il rendimento anno per anno.</li>
-                <li><strong>Simulazione Monte Carlo</strong>: Simula molteplici scenari casuali per valutare la probabilità di risultati diversi.</li>
+                <li><strong>Annual Contribution Growth</strong>: How much your monthly contribution will increase each year.</li>
+                <li><strong>Management Fees</strong>: The annual percentage cost of the fund (TER).</li>
+                <li><strong>Volatility</strong>: How variable the return is year by year.</li>
+                <li><strong>Monte Carlo Simulation</strong>: Simulates multiple random scenarios to evaluate probability of different outcomes.</li>
             </ul>
             
             <div class="alert alert-info mt-4">
                 <i class="fas fa-lightbulb me-2"></i>
-                Suggerimento: Inizia con i parametri base, esegui una simulazione, poi aggiusta i parametri avanzati per affinare i risultati.
+                Tip: Start with basic parameters, run a simulation, then adjust advanced parameters to refine results.
             </div>
         `;
         
@@ -384,7 +384,7 @@ const ETFSimulator = {
         helpModal.show();
     },
     
-    // Aggiorna i default in base al tipo di ETF selezionato
+    // Update defaults based on selected ETF type
     updateETFDefaults: function() {
         const etfType = document.getElementById('etfType').value;
         const defaults = {
@@ -402,7 +402,7 @@ const ETFSimulator = {
             document.getElementById('volatilityValue').textContent = `${defaults[etfType].volatility}%`;
             document.getElementById('managementFees').value = defaults[etfType].fees;
             
-            this.showAlert(`Impostazioni predefinite per ${this.getETFTypeName(etfType)} caricate.`, "info");
+            this.showAlert(`Default settings for ${this.getETFTypeName(etfType)} loaded.`, "info");
         }
     }
 };

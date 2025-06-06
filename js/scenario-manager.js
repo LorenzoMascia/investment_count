@@ -1,22 +1,22 @@
 /**
- * Gestisce gli scenari di investimento dell'ETF Simulator.
+ * Manages the investment scenarios for the ETF Simulator.
  */
 const ScenarioManager = {
   scenarios: [],
   activeScenario: null,
 
   /**
-   * Inizializza lo scenario manager caricando i dati dal localStorage
+   * Initializes the scenario manager by loading data from localStorage
    */
   init() {
     this.scenarios = Utils.storage.get('scenarios', []);
     this.render();
-    console.log('ScenarioManager inizializzato con', this.scenarios.length, 'scenari');
+    console.log('ScenarioManager initialized with', this.scenarios.length, 'scenarios');
   },
 
   /**
-   * Aggiunge uno scenario nuovo o esistente
-   * @param {Object|null} scenario - Scenario da aggiungere (opzionale)
+   * Adds a new or existing scenario
+   * @param {Object|null} scenario - Scenario to add (optional)
    */
   add(scenario = null) {
     const newScenario = scenario || {
@@ -31,13 +31,13 @@ const ScenarioManager = {
     this.save();
     this.render();
 
-    // Apri il modal di modifica per il nuovo scenario
+    // Open the edit modal for the new scenario
     this.edit(newScenario.id);
   },
 
   /**
-   * Rimuove uno scenario
-   * @param {string} id - ID dello scenario
+   * Removes a scenario
+   * @param {string} id - Scenario ID
    */
   remove(id) {
     const index = this.scenarios.findIndex(s => s.id === id);
@@ -45,13 +45,13 @@ const ScenarioManager = {
       this.scenarios.splice(index, 1);
       this.save();
       this.render();
-      Utils.showToast('Scenario eliminato', 'success');
+      Utils.showToast('Scenario deleted', 'success');
     }
   },
 
   /**
-   * Modifica uno scenario mostrando un modal
-   * @param {string} id - ID dello scenario
+   * Edits a scenario by showing a modal
+   * @param {string} id - Scenario ID
    */
   edit(id) {
     const scenario = this.scenarios.find(s => s.id === id);
@@ -69,8 +69,8 @@ const ScenarioManager = {
   },
 
   /**
-   * Crea un modal per modificare uno scenario
-   * @param {Object} scenario - Lo scenario da modificare
+   * Creates an edit modal for a scenario
+   * @param {Object} scenario - Scenario to edit
    * @returns {HTMLElement}
    */
   createEditModal(scenario) {
@@ -80,44 +80,44 @@ const ScenarioManager = {
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Modifica Scenario</h5>
+            <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Scenario</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <form id="scenarioForm">
               <div class="mb-3">
-                <label class="form-label">Nome Scenario</label>
+                <label class="form-label">Scenario Name</label>
                 <input type="text" class="form-control" id="scenarioName" value="${scenario.name}" required>
               </div>
               <div class="row">
                 <div class="col-6">
-                  <label class="form-label">Rendimento Atteso (%)</label>
+                  <label class="form-label">Expected Return (%)</label>
                   <input type="number" class="form-control" id="scenarioReturn" 
                          value="${scenario.expectedReturn}" min="-50" max="50" step="0.1" required>
                 </div>
                 <div class="col-6">
-                  <label class="form-label">Volatilità (%)</label>
+                  <label class="form-label">Volatility (%)</label>
                   <input type="number" class="form-control" id="scenarioVolatility" 
                          value="${scenario.volatility}" min="0" max="100" step="0.1" required>
                 </div>
               </div>
               <div class="mb-3 mt-3">
-                <label class="form-label">Descrizione</label>
+                <label class="form-label">Description</label>
                 <textarea class="form-control" id="scenarioDescription" rows="3">${scenario.description}</textarea>
               </div>
               <div class="form-check mb-3">
                 <input class="form-check-input" type="checkbox" id="scenarioActive" ${scenario.active ? 'checked' : ''}>
-                <label class="form-check-label">Scenario Attivo</label>
+                <label class="form-check-label">Active Scenario</label>
               </div>
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="button" class="btn btn-danger" onclick="ScenarioManager.confirmDelete('${scenario.id}', this)">
-              <i class="fas fa-trash me-1"></i>Elimina
+              <i class="fas fa-trash me-1"></i>Delete
             </button>
             <button type="button" class="btn btn-primary" onclick="ScenarioManager.save('${scenario.id}')">
-              <i class="fas fa-save me-1"></i>Salva
+              <i class="fas fa-save me-1"></i>Save
             </button>
           </div>
         </div>
@@ -127,12 +127,12 @@ const ScenarioManager = {
   },
 
   /**
-   * Conferma l'eliminazione di uno scenario
-   * @param {string} id - ID dello scenario
-   * @param {HTMLElement} button - Bottone che ha attivato l'evento
+   * Confirms scenario deletion
+   * @param {string} id - Scenario ID
+   * @param {HTMLElement} button - Button that triggered the event
    */
   confirmDelete(id, button) {
-    if (confirm('Sei sicuro di voler eliminare questo scenario?')) {
+    if (confirm('Are you sure you want to delete this scenario?')) {
       this.remove(id);
       const modal = button.closest('.modal');
       if (modal) {
@@ -143,8 +143,8 @@ const ScenarioManager = {
   },
 
   /**
-   * Salva le modifiche a uno scenario
-   * @param {string} id - ID dello scenario
+   * Saves changes to a scenario
+   * @param {string} id - Scenario ID
    */
   save(id = null) {
     if (id) {
@@ -158,7 +158,7 @@ const ScenarioManager = {
       const activeInput = document.getElementById('scenarioActive');
 
       if (!nameInput || !returnInput || !volatilityInput || !descriptionInput || !activeInput) {
-        Utils.showToast('Errore nel recupero dei campi del form', 'danger');
+        Utils.showToast('Error retrieving form fields', 'danger');
         return;
       }
 
@@ -169,7 +169,7 @@ const ScenarioManager = {
       const isActive = activeInput.checked;
 
       if (!name) {
-        Utils.showToast('Il nome dello scenario non può essere vuoto', 'warning');
+        Utils.showToast('Scenario name cannot be empty', 'warning');
         return;
       }
 
@@ -192,7 +192,7 @@ const ScenarioManager = {
         bsModal.hide();
       }
 
-      Utils.showToast('Scenario salvato', 'success');
+      Utils.showToast('Scenario saved', 'success');
     }
 
     Utils.storage.set('scenarios', this.scenarios);
@@ -200,8 +200,8 @@ const ScenarioManager = {
   },
 
   /**
-   * Attiva uno scenario
-   * @param {string} id - ID dello scenario
+   * Activates a scenario
+   * @param {string} id - Scenario ID
    */
   activate(id) {
     this.scenarios.forEach(s => s.active = false);
@@ -220,14 +220,14 @@ const ScenarioManager = {
         volatilityValueEl.textContent = `${scenario.volatility}%`;
       }
 
-      Utils.showToast(`Scenario "${scenario.name}" attivato`, 'info');
+      Utils.showToast(`Scenario "${scenario.name}" activated`, 'info');
     }
 
     this.save();
   },
 
   /**
-   * Carica scenari predefiniti
+   * Loads preset scenarios
    */
   loadPresets() {
     const presets = CONFIG.SCENARIO_PRESETS;
@@ -237,11 +237,11 @@ const ScenarioManager = {
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title"><i class="fas fa-download me-2"></i>Carica Scenari Predefiniti</h5>
+            <h5 class="modal-title"><i class="fas fa-download me-2"></i>Load Preset Scenarios</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
-            <p>Seleziona gli scenari predefiniti da aggiungere:</p>
+            <p>Select preset scenarios to add:</p>
             <div class="list-group">
               ${presets.map(preset => `
                 <div class="list-group-item">
@@ -250,7 +250,7 @@ const ScenarioManager = {
                     <label class="form-check-label" for="preset_${preset.name}">
                       <strong>${preset.name}</strong><br>
                       <small class="text-muted">
-                        Rendimento: ${preset.expectedReturn}% | Volatilità: ${preset.volatility}%<br>
+                        Return: ${preset.expectedReturn}% | Volatility: ${preset.volatility}%<br>
                         ${preset.description}
                       </small>
                     </label>
@@ -260,9 +260,9 @@ const ScenarioManager = {
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="button" class="btn btn-primary" onclick="ScenarioManager.addPresets()">
-              <i class="fas fa-plus me-1"></i>Aggiungi Selezionati
+              <i class="fas fa-plus me-1"></i>Add Selected
             </button>
           </div>
         </div>
@@ -279,7 +279,7 @@ const ScenarioManager = {
   },
 
   /**
-   * Aggiunge gli scenari selezionati dai preset
+   * Adds selected preset scenarios
    */
   addPresets() {
     const checkboxes = document.querySelectorAll('input[type="checkbox"][id^="preset_"]:checked');
@@ -308,14 +308,14 @@ const ScenarioManager = {
     }
 
     if (added > 0) {
-      Utils.showToast(`${added} scenari aggiunti`, 'success');
+      Utils.showToast(`${added} scenarios added`, 'success');
     } else {
-      Utils.showToast('Nessun nuovo scenario aggiunto', 'info');
+      Utils.showToast('No new scenarios added', 'info');
     }
   },
 
   /**
-   * Renderizza la lista degli scenari nell'interfaccia
+   * Renders the scenario list in the UI
    */
   render() {
     const container = document.getElementById('scenariosList');
@@ -325,7 +325,7 @@ const ScenarioManager = {
       container.innerHTML = `
         <div class="text-center text-muted py-3">
           <i class="fas fa-inbox fa-2x mb-2"></i>
-          <p>Nessuno scenario configurato</p>
+          <p>No scenarios configured</p>
         </div>
       `;
       return;
@@ -337,22 +337,22 @@ const ScenarioManager = {
           <div class="flex-grow-1">
             <div class="d-flex align-items-center mb-1">
               <h6 class="mb-0 me-2">${scenario.name}</h6>
-              ${scenario.active ? '<span class="badge bg-primary">Attivo</span>' : ''}
+              ${scenario.active ? '<span class="badge bg-primary">Active</span>' : ''}
             </div>
             <div class="small text-muted mb-2">
-              <i class="fas fa-chart-line me-1"></i>${scenario.expectedReturn}% rendimento | 
-              <i class="fas fa-chart-area me-1"></i>${scenario.volatility}% volatilità
+              <i class="fas fa-chart-line me-1"></i>${scenario.expectedReturn}% return | 
+              <i class="fas fa-chart-area me-1"></i>${scenario.volatility}% volatility
             </div>
             ${scenario.description ? `<div class="small text-muted">${scenario.description}</div>` : ''}
           </div>
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-outline-primary" onclick="ScenarioManager.activate('${scenario.id}')" title="Attiva scenario" ${scenario.active ? 'disabled' : ''}>
+            <button class="btn btn-outline-primary" onclick="ScenarioManager.activate('${scenario.id}')" title="Activate scenario" ${scenario.active ? 'disabled' : ''}>
               <i class="fas fa-play"></i>
             </button>
-            <button class="btn btn-outline-secondary" onclick="ScenarioManager.edit('${scenario.id}')" title="Modifica scenario">
+            <button class="btn btn-outline-secondary" onclick="ScenarioManager.edit('${scenario.id}')" title="Edit scenario">
               <i class="fas fa-edit"></i>
             </button>
-            <button class="btn btn-outline-danger" onclick="ScenarioManager.remove('${scenario.id}')" title="Elimina scenario">
+            <button class="btn btn-outline-danger" onclick="ScenarioManager.remove('${scenario.id}')" title="Delete scenario">
               <i class="fas fa-trash"></i>
             </button>
           </div>
@@ -362,7 +362,7 @@ const ScenarioManager = {
   },
 
   /**
-   * Restituisce lo scenario attivo
+   * Returns the active scenario
    * @returns {Object|null}
    */
   getActive() {
@@ -370,7 +370,7 @@ const ScenarioManager = {
   },
 
   /**
-   * Esporta tutti gli scenari in formato JSON
+   * Exports all scenarios in JSON format
    */
   export() {
     const data = {
@@ -379,12 +379,12 @@ const ScenarioManager = {
       version: CONFIG.VERSION
     };
     const json = JSON.stringify(data, null, 2);
-    Utils.saveFile(json, 'scenari-etf.json', 'application/json');
-    Utils.showToast('Scenari esportati', 'success');
+    Utils.saveFile(json, 'etf-scenarios.json', 'application/json');
+    Utils.showToast('Scenarios exported', 'success');
   },
 
   /**
-   * Importa scenari da un file JSON
+   * Imports scenarios from a JSON file
    */
   async import() {
     try {
@@ -397,33 +397,35 @@ const ScenarioManager = {
           this.scenarios.push(scenario);
         });
         this.save();
-        Utils.showToast(`${data.scenarios.length} scenari importati`, 'success');
+        Utils.showToast(`${data.scenarios.length} scenarios imported`, 'success');
       } else {
-        throw new Error('Formato file non valido');
+        throw new Error('Invalid file format');
       }
     } catch (error) {
-      Utils.showToast('Errore nell\'importazione: ' + error.message, 'danger');
+      Utils.showToast('Import error: ' + error.message, 'danger');
     }
   },
+
   /**
-   * Restituisce tutti gli scenari
+   * Returns all scenarios
    * @returns {Array<Object>}
    */
   getScenarios() {
     return this.scenarios;
   },
+
   /**
-   * Resetta tutti gli scenari
+   * Resets all scenarios
    */
   reset() {
-    if (confirm('Sei sicuro di voler eliminare tutti gli scenari?')) {
+    if (confirm('Are you sure you want to delete all scenarios?')) {
       this.scenarios = [];
       this.activeScenario = null;
       this.save();
-      Utils.showToast('Tutti gli scenari eliminati', 'success');
+      Utils.showToast('All scenarios deleted', 'success');
     }
   }
 };
 
-// Rendi ScenarioManager globale
+// Make ScenarioManager global
 window.ScenarioManager = ScenarioManager;
